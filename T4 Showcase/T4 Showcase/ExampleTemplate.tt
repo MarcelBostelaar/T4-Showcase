@@ -1,0 +1,74 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+
+/*
+**This tuplecode was generated using a text template.
+*/
+
+<#
+
+List<uint> TuplesToMake = new List<uint>();
+
+//*********************************
+//*Define what tuples to make here*
+//*********************************
+
+for(uint i = 2; i<= 5; i++){
+	TuplesToMake.Add(i);
+}
+
+
+//********************
+//*Stop defining here*
+//********************
+
+
+var distinctValues = TuplesToMake.Distinct();
+
+//Tuple class code empty
+string classcode = @"
+class TupleOf{0}<{1}>{{
+	public TupleOf{0}({2}){{
+{3}
+	}}
+{4}
+}}
+";
+
+foreach(var value in distinctValues){
+	if(value >= 2)
+		Write(BuildTupleFromNumber(classcode, value));
+}
+
+
+//Write(classcode);
+#>
+
+<#+
+
+	string BuildTupleFromNumber(string classcode, uint amountOfItems){
+		string GenericTypes = "";
+		string Arguments = "";
+		string Constructor = "";
+		string Properties = "";
+		for(int i = 1; i<= amountOfItems; i++){
+			GenericTypes += "Type" + i;
+			Arguments += "Type" + i + " item" + i;
+			Constructor += "\t\tItem" + i + " = " + "item" + i + ";";
+			Properties += "\tpublic Type" + i + " Item" + i + "{get; private set;}";
+
+
+			if(i != amountOfItems){
+				GenericTypes += ",";
+				Arguments += ",";
+				Constructor += "\r\n";
+				Properties += "\r\n";
+			}
+		}
+		return String.Format(classcode, amountOfItems, GenericTypes, Arguments, Constructor, Properties);
+	}
+#>
